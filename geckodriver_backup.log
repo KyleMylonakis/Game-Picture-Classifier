@@ -1,8 +1,0 @@
-1501811859119	geckodriver	INFO	Listening on 127.0.0.1:40491
-1501811860123	mozprofile::profile	INFO	Using profile path /tmp/rust_mozprofile.zwaEn375HGXh
-1501811860127	geckodriver::marionette	INFO	Starting browser /usr/bin/firefox
-1501811860141	geckodriver::marionette	INFO	Connecting to Marionette on localhost:35337
-1501811860737	Marionette	WARN	Deprecated preference marionette.defaultPrefs.enabled detected, please use marionette.enabled
-1501811862546	Marionette	INFO	Listening on port 35337
-1501811862679	Marionette	WARN	TLS certificate errors will be ignored for this session
-1501811953138	Marionette	INFO	New connections will no longer be accepted
