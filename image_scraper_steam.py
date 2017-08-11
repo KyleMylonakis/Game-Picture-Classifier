@@ -27,6 +27,7 @@ def scrape(steam_app_id,num_requested):
     pages_to_load = int(num_requested/100) + 1
 
     url_list = []
+    num_urls = 0
 
     for current_page_number in range(1,pages_to_load+1):
         try:
