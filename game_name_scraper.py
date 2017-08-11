@@ -1,8 +1,8 @@
-###########################
+##################################################################
 # This program generates a csv file named "top_100_games.csv"
 # containing a Pandas dataframe of the top 100 most played games
 # on steam.
-############################
+###################################################################
 
 from lxml import html
 import requests
