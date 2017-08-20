@@ -5,15 +5,13 @@
 # arguments.
 ###############################################################
 
-
-import pandas as pd
 import os
 import game_name_scraper
-import image_scraper_steam
+#import image_scraper_steam
 import sys 
-import generate_database
+#import generate_database
 import requests
-
+import pandas as pd
 
 os.environ["PATH"] += os.pathsep + os.getcwd()
 
@@ -27,12 +25,17 @@ def main():
         print("CSV Already Exists")
 
     # Create folder to house csv files of urls
-    download_path ='game_urls/'
-    if not os.path.exists(download_path):
-            print("Folder for URLs does not exist: Please run generate_database.py first")
-            
+    url_path ='game_urls/'
+    if not os.path.exists(url_path):
+        print("Folder for URLs does not exist: Please run generate_database.py first")
     else:
         print("Folder for URLs exists. Proceeding")
+
+    download_path ='game_images/'
+    if not os.path.exists(url_path):
+        print("Image Database Directory Successfuly created")
+            
+
 
 
 
@@ -53,14 +56,17 @@ def main():
 
     for ii in range(0,number_of_games):
         #print(ii)
-        game_df = pd.read_csv(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'.csv')
+        game_df = pd.read_csv(url_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'.csv')
         #print(game_df.head())
         num_pics = 0
         for url in game_df['URLs']:
+            if not os.path.exists(download_path +'/raw_images/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")):
+                print('Creating Raw Image Folder')
+                os.makedirs(download_path +'/raw_images/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_"))
             if num_pics < pics_per_game:
                 img_url = url
                 img = requests.get(img_url).content
-                with open(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'/' + str(num_pics) , 'wb' ) as handler:
+                with open(download_path +'/raw_images/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_") +'/' +str(num_pics), 'wb' ) as handler:
                     handler.write(img)
                 num_pics +=1
                 print("Downloaded image " + str(num_pics) + " of " + str(pics_per_game) + " for " + games_df.at[ii,'Game Names'])
