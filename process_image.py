@@ -22,8 +22,8 @@ if not os.path.exists(os.getcwd() + '/game_images/processed_images/'):
 raw_dir = os.getcwd() + '/game_images/raw_images'
 
 # Select desired output resolution
-iheight = 576
-iwidth = 1024
+iheight = 28
+iwidth = 28
 
 
 # Walk over all subdirectories in the raw database
@@ -34,7 +34,7 @@ for root, dirs, files in os.walk(raw_dir):
             # Figure out which game the image comes from
             current_game = []
             for ii in range(len(root)):
-                if not (root[-(ii+1)] == ('\\' or '/')):
+                if not (root[-(ii+1)] == ( '/' or '\\')):
                     current_game.append(root[-ii -1])
                 else:
                     break
@@ -54,7 +54,7 @@ for root, dirs, files in os.walk(raw_dir):
             img_p = scipy.misc.imresize(img_p, (iheight, iwidth))
             img_p = scipy.misc.toimage(img_p)
             # Need to save with a file extension specified
-            img_p.save(os.getcwd() + '/game_images/processed_images/' + current_game + '/' + item + '.png')
+            img_p.save(os.getcwd() + '/game_images/processed_images/' + str(current_game) + '/' + str(item) + '.png')
             print('Successfully Processed ' + current_game + ' Image ' + item)
 
         except:

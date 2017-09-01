@@ -51,14 +51,14 @@ def main():
 
     for ii in range(0,number_of_games):
         #print(ii)
-        if not os.path.exists(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'/'):
+        if not os.path.exists(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")+'/'):
             print("Folder for " + games_df.at[ii,'Game Names'] + " does not exist: Creating folder")
-            os.makedirs(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'/')
+            os.makedirs(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")+'/')
             print("Folder created")
 
         game_id = str(games_df.at[ii,'App ID'])
         game_image_df = pd.DataFrame({'URLs':image_scraper_steam.scrape(game_id, pics_per_game)})
-        game_image_df.to_csv(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "_")+'.csv')
+        game_image_df.to_csv(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")+'/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")+'.csv')
         print('Sucessfuly scraped ' +games_df.at[ii,'Game Names']+', ID: ', game_id )
 
     print("Database generated.")
