@@ -6,7 +6,7 @@
 #---------------------------------------------------------------------------------------------------------------------
 
 """
-- Should be run with os argumetns: Num_games Num_scrolls Num_down. 
+- hould be run with os argumetns: Num_games Num_scrolls Num_down. 
 Otherwise provide these integers as a list.
 - If Top100Games.csv does not exist Top100Games.py is called to create it.
 - If they don't exist '/rawimages' is created and 'rawimages/game_name' directories are created 
@@ -38,7 +38,7 @@ def main(os_in = True, Nums = [5,2,10]):
         Num_scrolls = int(sys.argv[2])    # Number of scrolls to call
         Num_games = int(sys.argv[1])    # Number of Games to use. Ordered by most popular)
         Num_down = int(sys.argv[3])    # Number of Games to Download
-        download = True   # Decides if images are downloaded. If False only URLs are updated
+        #download = True   # Decides if images are downloaded. If False only URLs are updated
     
     else:
         Num_games,Num_scrolls,Num_down = Nums
@@ -66,11 +66,7 @@ def main(os_in = True, Nums = [5,2,10]):
         appID = int(row['STEAM ID'])
         name = row['GAME']
 
-        # Fixing the name. Should change this to  ASCI package
-        name = name.replace(' ','_')
-        name = name.replace(':','-c-')
-
-        print('Game: ', name)
+        print('Finding ', name)
 
         appID_str = str(appID)
         Num_scrolls_str = str(Num_scrolls)
@@ -83,17 +79,6 @@ def main(os_in = True, Nums = [5,2,10]):
         if not os.path.exists(image_folder):
             os.makedirs(image_folder)
         
-        # Make a file to hold all the URLs So you can search later and not download repeats
-
-        file_path = 'rawimages/'+fold_name +'/'+fold_name+'_URLs.csv'
-        if not os.path.isfile(file_path):
-            # If we haven't already made a URL list make one
-            G_URLS_df = pd.DataFrame({'IMG URL': []})
-            G_URLS_df.to_csv(file_path, index = False)
-        
-        else:
-            G_URLS_df = pd.read_csv(file_path)
-    
         # Loop through the number of scrolls
 
         for scroll in range(Num_scrolls):
@@ -107,7 +92,7 @@ def main(os_in = True, Nums = [5,2,10]):
                 # Request the page
                 g_page = requests.get(g_url)
 
-                print(name+' community found.')
+                print('Scroll %d ' % scroll )
 
                 # Get the page and make the tree
                 g_page = requests.get(g_url) 
@@ -115,63 +100,38 @@ def main(os_in = True, Nums = [5,2,10]):
 
                 #Scrape for the sources of the images displayed
                 g_img_urls = g_tree.xpath('//img[@class = "apphub_CardContentPreviewImage"]/@src')
-
-                # New Url dataframe
-                new_urls_df = pd.DataFrame({'IMG URL': g_img_urls})
-
-                # Add the urls to the old ones
-                G_URLS_df =G_URLS_df.append(new_urls_df)
-
-                # Make a column to check if there are duplicates
-                G_URLS_df['DUPLICATE'] = G_URLS_df.duplicated()
-
-                # Pick out only those that were not duplicates
-                G_URLS_df = G_URLS_df[G_URLS_df['DUPLICATE'] == False]
-
-                # Drop the duplicate column
-                G_URLS_df = G_URLS_df.drop('DUPLICATE', axis = 1)
+                print('Found %d images to scrape' % len(g_img_urls))
+           
+                # Make a download folder inside the game folder
+                new_folder = image_folder +'/downloads/'
                 
-                # Write the csv
-                G_URLS_df.to_csv(file_path, index = False)
+                # Check if it exists
+                if not os.path.isdir(new_folder):
+                    os.makedirs(new_folder)
                 
-                # Download the images from the urls
-                if download:
-                    limit = min([Num_down, len(g_img_urls)])
+                # Find the number of elements in the folder
+                # index starts after that one.
+                img_label = len(os.listdir(new_folder))
 
-                    G_URLS_df_cut = G_URLS_df.iloc[:limit]
-                    print('Downloading Images for scroll %d \n' % scroll )
+                go_to = min([len(g_img_urls),Num_down])
 
-                    # Make a download folder inside the game folder
-                    new_folder = image_folder +'/downloads/'
+                for ii in range(go_to):
+                    # Get the row data and then the image from its page
+                    row_url = g_img_urls[ii]
+                    img_data = requests.get(row_url).content
+
+                    # Image name to save as appID_(Download number).jpg
+                    image_name = appID_str+'_'+ str(ii+img_label)
                     
-                    # Check if it exists
-                    if not os.path.isdir(new_folder):
-                        os.makedirs(new_folder)
-                    
-                    # Find the number of elements in the folder
-                    # index starts after that one.
-                    img_label = len(os.listdir(new_folder))
+                    print('Downloading image '+str(ii))
 
-                    # Loop through the rows in our URL dataframe
-                    for ii, G_URLS_row in G_URLS_df_cut.iterrows():                        
-                        # Get the row data and then the image from its page
-                        row_url = G_URLS_row['IMG URL']
-                        img_data = requests.get(row_url).content
-
-                        # Image name to save as appID_(Download number).jpg
-                        image_name = appID_str+'_'+ str(ii+img_label)
-                        
-                        print('Downloading image '+str(ii)+' of %s' % name)
-
-                        # Write the image into its folder
-                        with open(new_folder+ image_name +".jpg", 'wb') as handler:
-                            handler.write(img_data)
+                    # Write the image into its folder
+                    with open(new_folder+ image_name +".jpg", 'wb') as handler:
+                        handler.write(img_data)
 
     # IF the community does not exist
             except:
                 print(name + ' community not found')
-                G_URLS_df['IMG URL'] = 'COMMUNITY NOT FOUND'
-                G_URLS_df.to_csv(file_path)
 
 if __name__ == '__main__':
     main()
