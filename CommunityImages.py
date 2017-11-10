@@ -5,6 +5,18 @@
 #
 #---------------------------------------------------------------------------------------------------------------------
 
+"""
+- Should be run with os argumetns: Num_games Num_scrolls Num_down. 
+Otherwise provide these integers as a list.
+- If Top100Games.csv does not exist Top100Games.py is called to create it.
+- If they don't exist '/rawimages' is created and 'rawimages/game_name' directories are created 
+for each game. 
+- In 'rawimages/game_folder' a csv containing the URLs of images from the games steam community is created/updated.
+- In 'rawimages/game_folder' '/downloads' is created.
+- If the games steam community page is found Num_scrolls*Num_down images are saved in the downloads folder.abs
+If not then the game's URL dataframe is updated with COMMUNITY NOT FOUND and the program continues 
+ """
+
 
 
 import os
@@ -14,19 +26,22 @@ import requests
 import pandas as pd
 import Top100Games
 import sys
-# If Top100Games.csv does not exist Top100Games.py is called to create it.
-# "rawimages"  and "rawimages/game_name" directories are created. 
-# In each game_name folder a csv containing the URLs of images from the games steam community is created/updated.
-# If download = True images from this URL list are downloaded and stored in "downloads" folder 
 
-def main():
-    """ OS argumetns: Num_games Num_scrolls Num_down"""
+def main(os_in = True, Nums = [5,2,10]):
+    """ OS argumetns: Num_games Num_scrolls Num_down
+    If os_in = False
+    Nums: Default is set low for testing purposes.
+    """
     # Set Parameters
 
-    Num_scrolls = int(sys.argv[2])    # Number of scrolls to call
-    Num_games = int(sys.argv[1])    # Number of Games to use. Ordered by most popular)
-    Num_down = int(sys.argv[3])    # Number of Games to Download
-    download = True   # Decides if images are downloaded. If False only URLs are updated
+    if os_in:
+        Num_scrolls = int(sys.argv[2])    # Number of scrolls to call
+        Num_games = int(sys.argv[1])    # Number of Games to use. Ordered by most popular)
+        Num_down = int(sys.argv[3])    # Number of Games to Download
+        download = True   # Decides if images are downloaded. If False only URLs are updated
+    
+    else:
+        Num_games,Num_scrolls,Num_down = Nums
     
     print('Games, Scrolls, Down')
     print(Num_games,Num_scrolls,Num_down)
@@ -117,7 +132,7 @@ def main():
                 G_URLS_df = G_URLS_df.drop('DUPLICATE', axis = 1)
                 
                 # Write the csv
-                G_URLS_df.to_csv(file_path+'.csv', index = False)
+                G_URLS_df.to_csv(file_path, index = False)
                 
                 # Download the images from the urls
                 if download:
@@ -156,7 +171,7 @@ def main():
             except:
                 print(name + ' community not found')
                 G_URLS_df['IMG URL'] = 'COMMUNITY NOT FOUND'
-                G_URLS_df.to_csv(file_path+'.csv')
+                G_URLS_df.to_csv(file_path)
 
 if __name__ == '__main__':
     main()
