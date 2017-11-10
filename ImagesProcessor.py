@@ -4,7 +4,16 @@
 #       RETURN TENSOR OF PROCESSED IMAGES IN GAME FOLDER
 #
 #----------------------------------------------------------------------------------------
-
+"""
+- If "rawimages" folder exists ImagProcessor.py crawls through the game folders inside "rawimages". 
+Otherwise CommunityImages.py is called.
+- For each game the program goes through 'game_folder/downloads' and resizes the images.
+- Resized images are stored in 'game_folder/processed' labeled by gameID_download_number.
+- Images are then stored in the all_processed tensor, which has shape (Total number of images, (resolution,3)),
+ alongside a labels tensor that stores the APPID and has shape (Total number of images). These tensors can
+ be directly used as data-label pairs for training. Specifically
+ image all_processed[i] has GameID labels[i].
+"""
 
 import os
 import numpy as np
@@ -13,15 +22,6 @@ from scipy import ndimage
 import CommunityImages
 import pandas as pd
 import matplotlib.pyplot as plt
-
-
-# If "rawimages" folder exists ImagProcessor.py crawls through the game folders inside "rawimages". Otherwise CommunityImages.py is called.
-# For each game folder it goes through the "downloads" folder and resizes all the images.
-# Images are stored in the all_processed tensor, which has shape (Total number of images, (resolution,3)), alongside a 
-## labels tensor that stores the APPID and has shape (Total number of images).
-# The images and labels are created at the same time so that the image all_processed[i] has GameID labels[i].
- 
-
 
 # Make the save directory
 if not os.path.isdir('processed/'):
@@ -34,7 +34,9 @@ resolution = (28,28)
 if not(os.path.isdir('rawimages')):
     print('rawimages file not found')
     print('Running CommunityImages')
-    CommunityImages.main()
+
+    # USING DEFAULT NUM ARGUMENT [5,2,10]!
+    CommunityImages.main(os_in = False)
     
 else:
     print('Found rawimages file')
@@ -77,8 +79,8 @@ for ifol in range(n_fold):
     # Some files don't have images.
     # Currently runs the WHOLE Community images. Change this to download only the missing games
     # Maybe keep the number of games in the download folder in the Top100Games.csv  
-    if not os.path.isdir(g_image_folder):
-        CommunityImages.main()
+    #if not os.path.isdir(g_image_folder):
+    #    CommunityImages.main()
 
     # Get the names of image files
     g_images = os.listdir(g_image_folder)
