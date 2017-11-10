@@ -4,8 +4,9 @@ import pandas as pd
 
 
 
-# Makes a CSV of the top 100 games on steam with their steam ids
-# DataFrame is of the form {'GAME': Games,'STEAM ID': GamesID}
+"""Makes a CSV of the current top 100 games on steam with their steam ids
+DataFrame is of the form {'GAME': Games,'STEAM ID': GamesID}. Dataframe is stored
+locally as Top100games.csv"""
 
 # Fix the names
 # Change this to a ASCI package
