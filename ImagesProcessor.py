@@ -30,7 +30,7 @@ def main():
         os.makedirs('processed/')
 
     # Set the desired resolution
-    resolution = (28,28)
+    resolution = (224,224)
 
     # Check if the rawimage file exists
     if not(os.path.isdir('rawimages')):
@@ -66,17 +66,20 @@ def main():
         
         g_name = games_folders[ifol]
 
+        print('Processing '+g_name)
+
         # Get gameID
         g_ix = ifol
         g_ID = g_df['STEAM ID'].iloc[ifol]
         
         # Find image folder
         g_folder = 'rawimages/'+g_name
-        g_image_folder = g_folder+'/downloads'
+        g_image_folder = g_folder
+        g_proc_folder = 'processed/'+g_name
 
         # Make folder to store the game's processed images for comparison sake
-        if not os.path.isdir(g_folder+'/processed'):
-            os.makedirs(g_folder+'/processed')
+        if not os.path.isdir(g_proc_folder):
+            os.makedirs(g_proc_folder)
 
         # Some files don't have images.
         # Currently runs the WHOLE Community images. Change this to download only the missing games
@@ -113,7 +116,7 @@ def main():
             g_proc_images[ig] = img_array
 
             # Save the processed image for future inspection
-            misc.imsave(g_folder+'/processed/%d_%d.jpg' % (g_ID,ig), img_array)
+            misc.imsave(g_proc_folder+'/%d_%d.jpg' % (g_ID,ig), img_array)
 
             # Count
             total_images += 1
@@ -139,8 +142,8 @@ def main():
     labels.shape = (total_images)
 
     # Save the data
-    np.save('processed/'+'proc_imgs_tensor',all_processed)
-    np.save('processed/'+'proc_labels_tensor', labels)
+    np.save('processed_total/'+'proc_imgs_tensor',all_processed)
+    np.save('processed_total/'+'proc_labels_tensor', labels)
 
 if __name__ == '__main__':
     main()
