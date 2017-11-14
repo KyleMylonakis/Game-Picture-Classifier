@@ -103,7 +103,10 @@ def main(os_in = True, Nums = [5,2,10]):
                 print('Found %d images to scrape' % len(g_img_urls))
            
                 # Make a download folder inside the game folder
-                new_folder = image_folder +'/downloads/'
+
+                # Changed to not add the unecessary downloads folder
+                #new_folder = image_folder +'/downloads/'
+                new_folder = image_folder
                 
                 # Check if it exists
                 if not os.path.isdir(new_folder):
@@ -126,7 +129,7 @@ def main(os_in = True, Nums = [5,2,10]):
                     print('Downloading image '+str(ii))
 
                     # Write the image into its folder
-                    with open(new_folder+ image_name +".jpg", 'wb') as handler:
+                    with open(new_folder+'/'+ image_name +".jpg", 'wb') as handler:
                         handler.write(img_data)
 
     # IF the community does not exist
