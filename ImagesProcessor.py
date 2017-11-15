@@ -67,7 +67,7 @@ def main():
         g_name = games_folders[ifol]
 
         print('Processing '+g_name)
-
+        
         # Get gameID
         g_ix = ifol
         g_ID = g_df['STEAM ID'].iloc[ifol]
@@ -92,47 +92,59 @@ def main():
 
         # Set number of images
         num_imgs = len(g_images)
+        print('Number of Images: ', num_imgs)
 
         # Create the tensor to hold the game's image arrays
         g_proc_images = np.zeros((len(g_images), resolution[0], resolution[1],3))
         
         # Loop through the images
         for ig in range(num_imgs):
+            
             # Get image and make a file path
             image = g_images[ig]
             img_path = g_image_folder+'/'+image
             
             # Read picture
             img_array = ndimage.imread(img_path)
-
-            #
-            # Here is where we can add any other preprocessing we like
-            #
-
-            # Change the resolution
-            img_array = misc.imresize(img_array, resolution)
-
-            # Update g_proc_images
-            g_proc_images[ig] = img_array
-
-            # Save the processed image for future inspection
-            misc.imsave(g_proc_folder+'/%d_%d.jpg' % (g_ID,ig), img_array)
-
-            # Count
-            total_images += 1
+            img_rank = len( img_array.shape)
             
-        # Make it an array
-        g_proc_images = np.array(g_proc_images)
-        
-        
+            # Some games have screenshots of text screens which are not rank 3 tensors and should
+            # be ignored.
+            if img_rank == 3:
+                
+                #
+                # Here is where we can add any other preprocessing we like
+                #
 
-        # Update all_processed 
-        all_processed[ifol] = g_proc_images
-        
-        # Update labels, appid and images
-        labels[ifol] = [g_ID]*num_imgs    
-        appid_col[ifol], images_col[ifol] = g_ID, g_proc_images
+                # Change the resolution
+                img_array = misc.imresize(img_array, resolution)
 
+                # Update g_proc_images
+                g_proc_images[ig] = img_array
+
+                # Save the processed image for future inspection
+                misc.imsave(g_proc_folder+'/%d_%d.jpg' % (g_ID,ig), img_array)
+
+                # Count
+                total_images += 1
+
+            else:
+                print('Image: ', img_path+' is incorrect size')        
+            # Make it an array
+            g_proc_images = np.array(g_proc_images)
+            
+            
+            #
+            # Need to save this before it exceeds memory!!
+            #
+
+            # Update all_processed 
+            #all_processed[ifol] = g_proc_images
+            
+            # Update labels, appid and images
+            #labels[ifol] = [g_ID]*num_imgs    
+            #appid_col[ifol], images_col[ifol] = g_ID, g_proc_images
+        
     # Make all_processed and labels into arrays
     all_processed = np.concatenate(all_processed, axis = 0)
     labels = np.concatenate(labels, axis = 0)
@@ -142,8 +154,8 @@ def main():
     labels.shape = (total_images)
 
     # Save the data
-    np.save('processed_total/'+'proc_imgs_tensor',all_processed)
-    np.save('processed_total/'+'proc_labels_tensor', labels)
+    #np.save('processed_total/'+'proc_imgs_tensor',all_processed)
+    #np.save('processed_total/'+'proc_labels_tensor', labels)
 
 if __name__ == '__main__':
     main()
