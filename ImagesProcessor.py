@@ -8,11 +8,11 @@
 - If "rawimages" folder exists ImagProcessor.py crawls through the game folders inside "rawimages". 
 Otherwise CommunityImages.py is called.
 - For each game the program goes through 'game_folder/downloads' and resizes the images.
-- Resized images are stored in 'game_folder/processed' labeled by gameID_download_number.
-- Images are then stored in the all_processed tensor, which has shape (Total number of images, (resolution,3)),
+- Resized images are stored in 'processed/game_folder' labeled by gameID_download_number.
+- REMOVED:(Images are then stored in the all_processed tensor, which has shape (Total number of images, (resolution,3)),
  alongside a labels tensor that stores the APPID and has shape (Total number of images). These tensors can
  be directly used as data-label pairs for training. Specifically
- image all_processed[i] has GameID labels[i].
+ image all_processed[i] has GameID labels[i].)
 """
 
 import os
@@ -144,14 +144,16 @@ def main():
             # Update labels, appid and images
             #labels[ifol] = [g_ID]*num_imgs    
             #appid_col[ifol], images_col[ifol] = g_ID, g_proc_images
-        
+    #    
     # Make all_processed and labels into arrays
-    all_processed = np.concatenate(all_processed, axis = 0)
-    labels = np.concatenate(labels, axis = 0)
+    #
+
+    #all_processed = np.concatenate(all_processed, axis = 0)
+    #labels = np.concatenate(labels, axis = 0)
 
     # Unwind them
-    all_processed.shape = (total_images, resolution[0],resolution[1],3)
-    labels.shape = (total_images)
+    #all_processed.shape = (total_images, resolution[0],resolution[1],3)
+    #labels.shape = (total_images)
 
     # Save the data
     #np.save('processed_total/'+'proc_imgs_tensor',all_processed)
