@@ -47,7 +47,7 @@ def main():
     #Save the list of games 
     games_df = pd.DataFrame({'Game Names': games, 'App ID': game_id})
     #print(games_df.head())
-    games_df.to_csv('top_100_games.csv')
+    games_df.to_csv('top_100_games.csv', encoding = 'utf-8')
     print("List created")
 
     #print(games_df)

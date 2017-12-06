@@ -11,6 +11,7 @@ import os
 import game_name_scraper
 import image_scraper_steam
 import sys 
+from unidecode import unidecode
 
 os.environ["PATH"] += os.pathsep + os.getcwd()
 
@@ -36,7 +37,7 @@ else:
 
 
 # Open games list as a pandas dataframe
-games_df = pd.read_csv('top_100_games.csv')
+games_df = pd.read_csv('top_100_games.csv', encoding = 'utf-8')
 #print(games_df.head())
 
 def main():
@@ -51,6 +52,7 @@ def main():
 
     for ii in range(0,number_of_games):
         #print(ii)
+        games_df.at[ii,'Game Names'] = unidecode(games_df.at[ii,'Game Names'])
         if not os.path.exists(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")+'/'):
             print("Folder for " + games_df.at[ii,'Game Names'] + " does not exist: Creating folder")
             os.makedirs(download_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")+'/')

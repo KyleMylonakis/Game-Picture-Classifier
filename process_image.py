@@ -34,12 +34,19 @@ for root, dirs, files in os.walk(raw_dir):
             # Figure out which game the image comes from
             current_game = []
             for ii in range(len(root)):
-                if not (root[-(ii+1)] == ( '/' or '\\')):
+
+                # Use this if statement for linux
+                #if not (root[-(ii+1)] ==  '/'): 
+                #    current_game.append(root[-ii -1])
+                
+                # Use this if statement for windows 
+                if not (root[-(ii+1)] == '\\'):
                     current_game.append(root[-ii -1])
                 else:
                     break
             current_game.reverse()
             current_game = ''.join(current_game)
+            print(current_game)
 
             #print(os.getcwd() + '/game_images/processed_images/' + current_game)
 
@@ -51,10 +58,10 @@ for root, dirs, files in os.walk(raw_dir):
 
             # Process the images
             img_p = ndim.imread(os.path.join(root, item))
-            img_p = scipy.misc.imresize(img_p, (iheight, iwidth))
+            img_p = scipy.misc.imresize(img_p, (iheight, iwidth, 3))
             img_p = scipy.misc.toimage(img_p)
             # Need to save with a file extension specified
-            img_p.save(os.getcwd() + '/game_images/processed_images/' + str(current_game) + '/' + str(item) + '.png')
+            img_p.save(os.getcwd() + '/game_images/processed_images/' + str(current_game) + '/' + str(item))
             print('Successfully Processed ' + current_game + ' Image ' + item)
 
         except:

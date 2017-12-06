@@ -46,7 +46,7 @@ def cnn_model_fn(features, labels, mode):
 
   # Logits Layer
   # Units is number of games
-  logits = tf.layers.dense(inputs=dropout, units=5)
+  logits = tf.layers.dense(inputs=dropout, units=98)
 
   predictions = {
       # Generate predictions (for PREDICT and EVAL mode)
@@ -61,7 +61,7 @@ def cnn_model_fn(features, labels, mode):
 
   # Calculate Loss (for both TRAIN and EVAL modes)
   # Depth is number of games
-  onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=5)
+  onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=98)
   loss = tf.losses.softmax_cross_entropy(
       onehot_labels=onehot_labels, logits=logits)
 
@@ -91,15 +91,15 @@ def main(unused_argv):
     sub_folders = next(os.walk(data_dir))[1]
     #print(len(sub_folders))
 
-    img_df = pd.DataFrame( columns = ['Image Data','Game ID', 'Game Name'])
+    img_df = pd.DataFrame( columns = ['Image Data','Game ID', 'App ID'])
 
     for ii in range(len(sub_folders)):
         game_img_dir = data_dir +'/' +sub_folders[ii]
         #print(game_img_dir)
         for root, dirs, files in os.walk(game_img_dir):
             for item in files:
-                img = ndim.imread(os.path.join(root, item))
-                temp = pd.DataFrame([[img,ii,sub_folders[ii]]], columns = ['Image Data','Game ID', 'Game Name'])
+                img = ndim.imread(os.path.join(root, item), mode='RGB')
+                temp = pd.DataFrame([[img,ii,sub_folders[ii]]], columns = ['Image Data','Game ID', 'App ID'])
                 #print(temp.head)
                 img_df = img_df.append(temp)
                 #print(temp.head())
@@ -109,7 +109,7 @@ def main(unused_argv):
 
 
     # Check to see if the data was imported correctl
-    #print(img_df.head())
+    #print(img_df.describe())
     #print(img_df.shape[0])
 
     #print(list(img_df['Image Data'].iloc[0].shape))
@@ -125,6 +125,7 @@ def main(unused_argv):
     n_data_variables = img_df.shape[0]
     n_training_variables = int(n_data_variables*.8)
     #print(n_training_variables)
+    #print(n_training_variables)
 
     #print(img_df['Image Data'])
 
@@ -133,22 +134,26 @@ def main(unused_argv):
         img_data_df.append(element)
     #print(img_data_df[-1])
     img_data_df = np.array(img_data_df)
-    #print(img_data_df)
+    #np.save('data_for_jay.npy', img_data_df)
+    #print(img_data_df.shape)
 
-    #print(img_data_df.shape())
-
+    #print(img_df.head())
+    
     img_labels = []
     for element in img_df['Game ID']:
         img_labels.append(element)
     img_labels = np.array(img_labels)
-    #print(img_labels)
+    #np.save('labels_for_jay.npy', img_labels)
+    #print(img_labels.shape)
 
     img_data_train = img_data_df[0:n_training_variables]
     img_data_validate = img_data_df[n_training_variables:]
+    #print(img_data_validate)
 
-
+    #print(img_labels)
     img_labels_train = img_labels[0:n_training_variables]
     img_labels_validate = img_labels[n_training_variables:]
+    #print(img_labels_validate)
 
 
     #features = [tf.feature_column.numeric_column("", shape=img_df['Image Data'].iloc[0].shape)]
@@ -168,8 +173,12 @@ def main(unused_argv):
     #eval_labels = np.asarray(mnist.test.labels, dtype=np.int32)
 
   # Create the Estimator
+    #img_classifier = tf.estimator.Estimator(
+    #    model_fn=cnn_model_fn, model_dir="/tmp/game_img_convnet_model")
+
+    # Dont save the model for training purposes
     img_classifier = tf.estimator.Estimator(
-        model_fn=cnn_model_fn, model_dir="/tmp/game_img_convnet_model")
+        model_fn=cnn_model_fn, model_dir="saved_network/basic_cnn")
 
     # Set up logging for predictions
     # Log the values in the "Softmax" tensor with label "probabilities"
@@ -181,18 +190,20 @@ def main(unused_argv):
     train_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": x_train},
         y=y_train,
-        batch_size=5,
-        num_epochs=None,
-        shuffle=True)
+        batch_size=100,
+        num_epochs=None, #Number of times to go through all the training
+        shuffle=False)
     img_classifier.train(
         input_fn=train_input_fn,
-        steps=2000,
+        steps=70000, # Total number of images in the training set
         hooks=[logging_hook])
 
+    print('***********************Training Successful*****************************')
     # Evaluate the model and print results
     eval_input_fn = tf.estimator.inputs.numpy_input_fn(
         x={"x": x_eval},
         y=y_eval,
+        batch_size=10,
         num_epochs=1,
         shuffle=False)
     eval_results = img_classifier.evaluate(input_fn=eval_input_fn)

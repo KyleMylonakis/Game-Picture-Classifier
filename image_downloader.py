@@ -12,6 +12,7 @@ import sys
 #import generate_database
 import requests
 import pandas as pd
+from unidecode import unidecode
 
 os.environ["PATH"] += os.pathsep + os.getcwd()
 
@@ -56,17 +57,18 @@ def main():
 
     for ii in range(0,number_of_games):
         #print(ii)
+        games_df.at[ii,'Game Names'] = unidecode(games_df.at[ii,'Game Names'])
         game_df = pd.read_csv(url_path + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")+'/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")+'.csv')
         #print(game_df.head())
         num_pics = 0
         for url in game_df['URLs']:
-            if not os.path.exists(download_path +'/raw_images/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-")):
+            if not os.path.exists(download_path +'/raw_images/' + str(games_df.at[ii,'App ID']).replace(" ", "_").replace(":", "-")):
                 print('Creating Raw Image Folder')
-                os.makedirs(download_path +'/raw_images/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-"))
+                os.makedirs(download_path +'/raw_images/' + str(games_df.at[ii,'App ID']).replace(" ", "_").replace(":", "-"))
             if num_pics < pics_per_game:
                 img_url = url
                 img = requests.get(img_url).content
-                with open(download_path +'/raw_images/' + games_df.at[ii,'Game Names'].replace(" ", "_").replace(":", "-") +'/' +str(num_pics), 'wb' ) as handler:
+                with open(download_path +'/raw_images/' + str(games_df.at[ii,'App ID']).replace(" ", "_").replace(":", "-") +'/' +str(num_pics) + '.png', 'wb' ) as handler:
                     handler.write(img)
                 num_pics +=1
                 print("Downloaded image " + str(num_pics) + " of " + str(pics_per_game) + " for " + games_df.at[ii,'Game Names'])
