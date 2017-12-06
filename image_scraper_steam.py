@@ -38,9 +38,9 @@ def scrape(steam_app_id,num_requested):
             current_page+= '&screenshotspage='+current_page_number+'&artpage='+current_page_number+'&allguidepage='+current_page_number+'&webguidepage='+current_page_number+'&integratedguidepage='+current_page_number+'&discussionspage='+current_page_number
             current_page+= '&numperpage=1000&browsefilter=trend&browsefilter=trend&l=english&appHubSubSection='+current_page_number+'&filterLanguage=default&searchText=&forceanon=1'
             #current_page = requests.get('http://steamcommunity.com/app/'+ steam_app_id +'/homecontent/?screenshotspage='+str(current_page_number)+'&numperpage=100&browsefilter=mostrecent&browsefilter=mostrecent&l=english&appHubSubSection=2&filterLanguage=default&searchText=&forceanon=1')
-            print("Tick")
+            #print("Tick")
             current_page = requests.get(current_page)
-            print("Tock")
+            #print("Tock")
             current_page_tree = html.fromstring(current_page.content)
             image_urls = current_page_tree.xpath('//img[@class = "apphub_CardContentPreviewImage"]/@src')
             #print(len(image_urls))
